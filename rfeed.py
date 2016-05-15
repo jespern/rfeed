@@ -465,7 +465,7 @@ class iTunesItem(Serializable):
 	""" Extension for iTunes Item metatags.
 	More information at https://www.apple.com/itunes/podcasts/specs.html
 	"""
-	def __init__(self, author = None, block = None, image = None, duration = None, explicit = None, is_closed_captioned = None, order = None, subtitle = None, summary = None):
+	def __init__(self, author = None, block = None, image = None, duration = None, explicit = None, is_closed_captioned = None, order = None, subtitle = None, summary = None, enclosure = None):
 		""" Keyword arguments:
 		author -- The author of the episode.
 		block -- Whether the episode should appear in the iTunes Store podcast directory.
@@ -473,6 +473,7 @@ class iTunesItem(Serializable):
 		duration -- Specifies the duration of the podcast episode.
 		explicit -- Whether your episode contains explicit material.
 		is_closed_captioned -- Whether your episode has embedded closed captioning.
+		enclosure -- iTunes enclosure.
 		order -- Used to override the default ordering of episodes in the iTunes Store.
 		subtitle -- A few words that represent the description of the episode.
 		summary -- An extended summary of the episode.
@@ -488,6 +489,7 @@ class iTunesItem(Serializable):
 		self.order = order
 		self.subtitle = subtitle
 		self.summary = summary
+		self.enclosure = enclosure
 
 	def publish(self, handler):
 		Serializable.publish(self, handler)
@@ -508,9 +510,14 @@ class iTunesItem(Serializable):
 		if self.is_closed_captioned is not None:
 			self._write_element("itunes:is_closed_captioned", "yes" if self.is_closed_captioned is True else "no")
 
-		self._write_element("itunes:order", str(self.order))
+		if self.order is not None:
+			self._write_element("itunes:order", str(self.order))
+
 		self._write_element("itunes:subtitle", self.subtitle)
 		self._write_element("itunes:summary", self.summary)
+
+		if self.enclosure is not None:
+			self.enclosure.publish(handler)
 
 
 class Item(Host):
@@ -519,7 +526,7 @@ class Item(Host):
 	of title or description must be present.
 	More information at http://cyber.law.harvard.edu/rss/rss.html#hrelementsOfLtitemgt
 	"""
-	def __init__(self, title = None, link = None, description = None, author = None, 
+	def __init__(self, title = None, link = None, description = None, author = None,
 	creator = None, categories = None, comments = None, enclosure = None,
 		guid = None, pubDate = None, source = None, extensions = None):
 		""" Keyword arguments:
